@@ -1,0 +1,87 @@
+[project]
+name = "docintel"
+version = "0.1.0"
+description = "Multi-tenant document intelligence API"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "boto3==1.43.106",
+    "celery==5.6.3",
+    "cryptography==50.0.2",
+    "django==5.2.17",
+    "django-filter==25.2",
+    "djangorestframework==3.16.1",
+    "djangorestframework-simplejwt==5.5.1",
+    "drf-spectacular==0.29.0",
+    "gunicorn==26.2.0",
+    "psycopg[binary]==3.3.6",
+    "pydantic==2.13.5",
+    "redis==8.1.0",
+    "sentry-sdk==2.71.0",
+    "structlog==26.1.0",
+]
+
+[dependency-groups]
+dev = [
+    "django-stubs==5.2.9",
+    "django-stubs-ext==5.2.9",
+    "djangorestframework-stubs==3.16.9",
+    "factory-boy==3.3.3",
+    "freezegun==1.5.5",
+    "mypy==1.19.1",
+    "pip-licenses==5.5.5",
+    "pre-commit==4.6.2",
+    "pytest==9.1.1",
+    "pytest-cov==7.1.0",
+    "pytest-django==4.14.0",
+    "ruff==0.16.9",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+target-version = "py312"
+line-length = 110
+src = ["docintel", "manage.py", "scripts"]
+extend-exclude = ["**/migrations/*"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+ignore = ["RUF012", "E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"docintel/config/settings/local.py" = ["F403", "F405"]
+"docintel/config/settings/test.py" = ["F403", "F405"]
+"docintel/config/settings/production.py" = ["F403", "F405"]
+"docintel/config/settings/docker.py" = ["F403", "F405"]
+"**/migrations/*.py" = ["I001"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["docintel"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "docintel.config.settings.test"
+pythonpath = ["."]
+addopts = "-q --reuse-db"
+testpaths = ["docintel/tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["docintel/apps"]
+omit = ["*/migrations/*", "*/management/commands/seed_demo.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
+packages = ["docintel"]
+exclude = ["(^|/)tests/", "(^|/)migrations/"]
+warn_unused_ignores = true
+
+[tool.django-stubs]
+django_settings_module = "docintel.config.settings.test"
